@@ -1,6 +1,6 @@
 package wip.githubpro.service;
 
-import wip.githubpro.model.NotForkRepoData;
+import wip.githubpro.model.repository.NotForkRepoData;
 
 import java.util.List;
 

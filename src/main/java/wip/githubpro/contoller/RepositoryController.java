@@ -4,7 +4,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import wip.githubpro.model.NotForkRepoData;
+import wip.githubpro.model.repository.NotForkRepoData;
 import wip.githubpro.service.RepositoryService;
 
 import java.util.List;

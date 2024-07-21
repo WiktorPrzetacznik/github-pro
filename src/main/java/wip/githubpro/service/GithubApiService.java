@@ -1,7 +1,7 @@
 package wip.githubpro.service;
 
-import wip.githubpro.model.repository.Branch;
-import wip.githubpro.model.repository.Repository;
+import wip.githubpro.model.github.Branch;
+import wip.githubpro.model.github.Repository;
 
 import java.util.List;
 

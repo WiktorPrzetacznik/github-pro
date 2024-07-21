@@ -2,7 +2,7 @@ package wip.githubpro.service;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import wip.githubpro.model.NotForkRepoData;
+import wip.githubpro.model.repository.NotForkRepoData;
 
 import java.util.List;
 

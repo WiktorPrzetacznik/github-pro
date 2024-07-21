@@ -6,8 +6,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilderFactory;
-import wip.githubpro.model.repository.Branch;
-import wip.githubpro.model.repository.Repository;
+import wip.githubpro.model.github.Branch;
+import wip.githubpro.model.github.Repository;
 
 import java.net.URI;
 import java.util.List;
