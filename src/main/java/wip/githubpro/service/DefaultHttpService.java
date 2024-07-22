@@ -38,6 +38,10 @@ public class DefaultHttpService implements HttpService {
         return data;
     }
 
+    /**
+     * @param linkHeaders values associated with Link header
+     * @return potential URI created from next pagination address
+     */
     private Optional<URI> getNextPaginationURI(List<String> linkHeaders) {
         if (!linkHeaders.isEmpty()) {
             for (String header : linkHeaders) {
