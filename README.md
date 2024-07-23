@@ -26,7 +26,7 @@ expected response type: Json
 
 ## Configuration
 
-Port can be changed via 
+Port can be changed via
 > server.port
 
 property in **application.properties** file.

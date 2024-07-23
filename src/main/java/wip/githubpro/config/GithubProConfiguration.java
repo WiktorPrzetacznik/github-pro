@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 @Configuration
 public class GithubProConfiguration {
-    
+
     @Bean
     public RestClient restClient() {
         return RestClient.builder()

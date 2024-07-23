@@ -40,12 +40,14 @@ public class RepositoryControllerTest {
 
     @Test
     public void statusIsOk() throws Exception {
-        when(httpService.getDataAsList(getReposURI(), new ParameterizedTypeReference<List<Repository>>() {}))
+        when(httpService.getDataAsList(getReposURI(), new ParameterizedTypeReference<List<Repository>>() {
+        }))
                 .thenReturn(List.of(
                         new Repository("repo1", new Owner("owner"), false),
                         new Repository("repo2", new Owner("owner"), true)
                 ));
-        when(httpService.getDataAsList(getBranchesURI(), new ParameterizedTypeReference<List<Branch>>() {}))
+        when(httpService.getDataAsList(getBranchesURI(), new ParameterizedTypeReference<List<Branch>>() {
+        }))
                 .thenReturn(List.of(
                         new Branch("branch1", new Commit("h4hm49mh946hm4"))
                 ));
@@ -56,7 +58,8 @@ public class RepositoryControllerTest {
 
     @Test
     public void statusIsNotFound() throws Exception {
-        when(httpService.getDataAsList(getReposURI(), new ParameterizedTypeReference<List<Repository>>() {}))
+        when(httpService.getDataAsList(getReposURI(), new ParameterizedTypeReference<List<Repository>>() {
+        }))
                 .thenThrow(new HttpClientErrorException(HttpStatusCode.valueOf(404), "Not Found"));
 
         mockMvc.perform(get("/user/username"))
@@ -65,12 +68,14 @@ public class RepositoryControllerTest {
 
     @Test
     public void okContentIsJson() throws Exception {
-        when(httpService.getDataAsList(getReposURI(), new ParameterizedTypeReference<List<Repository>>() {}))
+        when(httpService.getDataAsList(getReposURI(), new ParameterizedTypeReference<List<Repository>>() {
+        }))
                 .thenReturn(List.of(
                         new Repository("repo1", new Owner("owner"), false),
                         new Repository("repo2", new Owner("owner"), true)
                 ));
-        when(httpService.getDataAsList(getBranchesURI(), new ParameterizedTypeReference<List<Branch>>() {}))
+        when(httpService.getDataAsList(getBranchesURI(), new ParameterizedTypeReference<List<Branch>>() {
+        }))
                 .thenReturn(List.of(
                         new Branch("branch1", new Commit("h4hm49mh946hm4"))
                 ));
@@ -81,7 +86,8 @@ public class RepositoryControllerTest {
 
     @Test
     public void notFoundContentIsJson() throws Exception {
-        when(httpService.getDataAsList(getReposURI(), new ParameterizedTypeReference<List<Repository>>() {}))
+        when(httpService.getDataAsList(getReposURI(), new ParameterizedTypeReference<List<Repository>>() {
+        }))
                 .thenThrow(new HttpClientErrorException(HttpStatusCode.valueOf(404), "Not Found"));
 
         mockMvc.perform(get("/user/username"))

@@ -15,8 +15,8 @@ import wip.githubpro.model.repository.NotForkRepoData;
 import java.net.URI;
 import java.util.List;
 
-import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class RepositoryServiceTest {
@@ -39,12 +39,14 @@ public class RepositoryServiceTest {
                 .path("/repos/{owner}/{repo}/branches")
                 .build("owner", "repo1");
 
-        when(httpService.getDataAsList(getReposURI, new ParameterizedTypeReference<List<Repository>>() {}))
+        when(httpService.getDataAsList(getReposURI, new ParameterizedTypeReference<List<Repository>>() {
+        }))
                 .thenReturn(List.of(
                         new Repository("repo1", new Owner("owner"), false),
                         new Repository("repo2", new Owner("owner"), true)
                 ));
-        when(httpService.getDataAsList(getBranchesURI, new ParameterizedTypeReference<List<Branch>>() {}))
+        when(httpService.getDataAsList(getBranchesURI, new ParameterizedTypeReference<List<Branch>>() {
+        }))
                 .thenReturn(List.of(
                         new Branch("branch1", new Commit("h4hm49mh946hm4"))
                 ));

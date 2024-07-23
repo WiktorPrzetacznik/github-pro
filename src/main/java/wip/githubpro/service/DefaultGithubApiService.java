@@ -26,7 +26,8 @@ public class DefaultGithubApiService implements GithubApiService {
                         .builder()
                         .path("/users/{username}/repos")
                         .build(username),
-                new ParameterizedTypeReference<>(){}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -37,7 +38,8 @@ public class DefaultGithubApiService implements GithubApiService {
                         .builder()
                         .path("/repos/{owner}/{repo}/branches")
                         .build(owner, repo),
-                new ParameterizedTypeReference<>(){}
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
