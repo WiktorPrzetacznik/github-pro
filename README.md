@@ -8,6 +8,7 @@ A simple application utilising [Github v3 API](https://developer.github.com/v3).
 - Json type responses
 - helpful error messages
 - caching responses
+- basic configuration
 
 ## Installation
 
@@ -22,3 +23,10 @@ When running, application is available on localhost:8080, offering following API
 > /user/**username**/
 
 expected response type: Json
+
+## Configuration
+
+Port can be changed via 
+> server.port
+
+property in **application.properties** file.
