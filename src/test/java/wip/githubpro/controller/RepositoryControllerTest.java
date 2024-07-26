@@ -1,111 +1,97 @@
 package wip.githubpro.controller;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.util.UriBuilderFactory;
-import wip.githubpro.model.github.Branch;
-import wip.githubpro.model.github.Commit;
-import wip.githubpro.model.github.Owner;
-import wip.githubpro.model.github.Repository;
-import wip.githubpro.service.HttpService;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import wiremock.org.apache.commons.io.IOUtils;
 
-import java.net.URI;
-import java.util.List;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@WireMockTest
 public class RepositoryControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    private WebTestClient client;
+    private WireMockServer wireMockServer;
 
-    @Autowired
-    private UriBuilderFactory githubUriBuilderFactory;
+    @Value("${server.port}")
+    private String port;
 
-    @MockBean
-    private HttpService httpService;
-
-    @Test
-    public void statusIsOk() throws Exception {
-        when(httpService.getDataAsList(getReposURI(), new ParameterizedTypeReference<List<Repository>>() {
-        }))
-                .thenReturn(List.of(
-                        new Repository("repo1", new Owner("owner"), false),
-                        new Repository("repo2", new Owner("owner"), true)
-                ));
-        when(httpService.getDataAsList(getBranchesURI(), new ParameterizedTypeReference<List<Branch>>() {
-        }))
-                .thenReturn(List.of(
-                        new Branch("branch1", new Commit("h4hm49mh946hm4"))
-                ));
-
-        mockMvc.perform(get("/user/username"))
-                .andExpect(status().isOk());
+    @BeforeEach
+    public void setUp() throws IOException {
+        setUpWireMockServer();
+        setUpClient();
     }
 
-    @Test
-    public void statusIsNotFound() throws Exception {
-        when(httpService.getDataAsList(getReposURI(), new ParameterizedTypeReference<List<Repository>>() {
-        }))
-                .thenThrow(new HttpClientErrorException(HttpStatusCode.valueOf(404), "Not Found"));
-
-        mockMvc.perform(get("/user/username"))
-                .andExpect(status().isNotFound());
+    @AfterEach
+    public void clear() {
+        wireMockServer.stop();
     }
 
-    @Test
-    public void okContentIsJson() throws Exception {
-        when(httpService.getDataAsList(getReposURI(), new ParameterizedTypeReference<List<Repository>>() {
-        }))
-                .thenReturn(List.of(
-                        new Repository("repo1", new Owner("owner"), false),
-                        new Repository("repo2", new Owner("owner"), true)
+    private void setUpWireMockServer() throws IOException {
+        wireMockServer = new WireMockServer();
+        configureFor("localhost", Integer.parseInt(port));
+        wireMockServer.start();
+        stubFor(get(urlEqualTo("/user/existing_user"))
+                .willReturn(
+                        aResponse().withStatus(200)
+                                .withBody(IOUtils.resourceToString("/responses/existing_user_response.json", StandardCharsets.UTF_8))
+                                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 ));
-        when(httpService.getDataAsList(getBranchesURI(), new ParameterizedTypeReference<List<Branch>>() {
-        }))
-                .thenReturn(List.of(
-                        new Branch("branch1", new Commit("h4hm49mh946hm4"))
+        stubFor(get(urlEqualTo("/user/non_existing_user"))
+                .willReturn(
+                        aResponse().withStatus(404)
+                                .withBody(IOUtils.resourceToString("/responses/non_existing_user_response.json", StandardCharsets.UTF_8))
+                                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 ));
+    }
 
-        mockMvc.perform(get("/user/username"))
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    private void setUpClient() {
+        client = WebTestClient
+                .bindToServer()
+                .baseUrl(String.format("http://localhost:%s", port))
+                .build();
     }
 
     @Test
-    public void notFoundContentIsJson() throws Exception {
-        when(httpService.getDataAsList(getReposURI(), new ParameterizedTypeReference<List<Repository>>() {
-        }))
-                .thenThrow(new HttpClientErrorException(HttpStatusCode.valueOf(404), "Not Found"));
-
-        mockMvc.perform(get("/user/username"))
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    public void listNonForks_statusIsOk() {
+        client.get().uri("/user/existing_user")
+                .exchange()
+                .expectStatus().isOk();
     }
 
-    private URI getReposURI() {
-        return githubUriBuilderFactory
-                .builder()
-                .path("/users/{username}/repos")
-                .build("username");
+    @Test
+    public void listNonForks_statusIsNotFound() {
+        client.get().uri("/user/non_existing_user")
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
-    private URI getBranchesURI() {
-        return githubUriBuilderFactory
-                .builder()
-                .path("/repos/{owner}/{repo}/branches")
-                .build("owner", "repo1");
+    @Test
+    public void listNonForks_okIsJson() {
+        client.get().uri("/user/existing_user")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON);
+    }
+
+    @Test
+    public void listNonForks_NotFoundIsJson() {
+        client.get().uri("/user/non_existing_user")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON);
     }
 
 }
