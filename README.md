@@ -9,6 +9,7 @@ A simple application utilising [Github v3 API](https://developer.github.com/v3).
 - helpful error messages
 - caching responses
 - basic configuration
+- non-blocking http requests
 
 ## Installation
 

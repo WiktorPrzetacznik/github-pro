@@ -3,7 +3,7 @@ package wip.githubpro.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilderFactory;
 
@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 public class GithubProConfiguration {
 
     @Bean
-    public RestClient restClient() {
-        return RestClient.builder()
+    public WebClient webClient() {
+        return WebClient.builder()
                 .defaultHeader(HttpHeaders.ACCEPT, "application/json")
                 .build();
     }

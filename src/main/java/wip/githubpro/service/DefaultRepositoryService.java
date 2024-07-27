@@ -18,14 +18,14 @@ public class DefaultRepositoryService implements RepositoryService {
     @Override
     @Cacheable(cacheNames = "notforks", key = "#username")
     public List<NotForkRepoData> listNotForks(String username) {
-        return githubApiService.getUserRepositories(username)
-                .stream()
+        return githubApiService
+                .getUserRepositories(username)
                 .filter(repo -> !repo.fork())
-                .map(repo -> new NotForkRepoData(
-                        repo.name(), repo.owner().login(),
-                        githubApiService.getRepositoryBranches(repo.owner().login(), repo.name())
-                ))
-                .toList();
+                .flatMap(repo -> githubApiService.getRepositoryBranches(repo.owner().login(), repo.name())
+                        .collectList()
+                        .map(branches -> new NotForkRepoData(repo.name(), repo.owner().login(), branches)))
+                .collectList()
+                .block();
     }
 
 }
