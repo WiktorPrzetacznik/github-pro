@@ -63,21 +63,23 @@ public class RepositoryControllerTest {
     }
 
     @Test
-    public void listNonForks_statusIsOk() {
+    public void listNonForks_existinguser_statusIsOk() {
         client.get().uri("/user/existing_user")
+                .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk();
     }
 
     @Test
-    public void listNonForks_statusIsNotFound() {
+    public void listNonForks_nonexistinguser_statusIsNotFound() {
         client.get().uri("/user/non_existing_user")
+                .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound();
     }
 
     @Test
-    public void listNonForks_okIsJson() {
+    public void listNonForks_existinguser_okIsJson() {
         client.get().uri("/user/existing_user")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -86,12 +88,28 @@ public class RepositoryControllerTest {
     }
 
     @Test
-    public void listNonForks_NotFoundIsJson() {
+    public void listNonForks_nonexistinguser_NotFoundIsJson() {
         client.get().uri("/user/non_existing_user")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON);
+    }
+
+    @Test
+    public void listNonForks_existinguser_bodyIsAsExpected() throws IOException {
+        client.get().uri("/user/existing_user")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectBody().json(IOUtils.resourceToString("/responses/existing_user_response.json", StandardCharsets.UTF_8));
+    }
+
+    @Test
+    public void listNonForks_nonexistinguser_bodyIsAsExpected() throws IOException {
+        client.get().uri("/user/non_existing_user")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectBody().json(IOUtils.resourceToString("/responses/non_existing_user_response.json", StandardCharsets.UTF_8));
     }
 
 }
